@@ -1,0 +1,123 @@
+# Example Lovelace configuration for Sure Finance addon
+# Add this to your Home Assistant dashboard configuration
+
+title: Financial Dashboard
+views:
+  - title: Overview
+    path: overview
+    cards:
+      # Financial Summary Card
+      - type: custom:sure-finance-summary-card
+        entities:
+          net_worth: sensor.sure_finance_net_worth
+          cashflow: sensor.sure_finance_total_cashflow
+          outflow: sensor.sure_finance_total_outflow
+          liability: sensor.sure_finance_total_liability
+          savings_rate: sensor.sure_finance_monthly_savings_rate
+      
+      # Expense Breakdown
+      - type: custom:sure-finance-expense-card
+        entity: sensor.sure_finance_total_outflow
+        title: Monthly Expense Breakdown
+        max_items: 8
+      
+      # Account Balances
+      - type: custom:sure-finance-accounts-card
+        title: Account Balances
+        entities:
+          - sensor.sure_finance_account_checking
+          - sensor.sure_finance_account_savings
+          - sensor.sure_finance_account_credit_card
+          - sensor.sure_finance_account_mortgage
+      
+      # Standard cards for individual sensors
+      - type: horizontal-stack
+        cards:
+          - type: sensor
+            entity: sensor.sure_finance_total_cashflow
+            name: Income
+            icon: mdi:cash-plus
+            graph: line
+          
+          - type: sensor
+            entity: sensor.sure_finance_total_outflow
+            name: Expenses
+            icon: mdi:cash-minus
+            graph: line
+      
+      # Gauge for savings rate
+      - type: gauge
+        entity: sensor.sure_finance_monthly_savings_rate
+        name: Savings Rate
+        unit: '%'
+        min: 0
+        max: 100
+        severity:
+          green: 20
+          yellow: 10
+          red: 0
+      
+      # History graph
+      - type: history-graph
+        title: Financial Trends
+        entities:
+          - sensor.sure_finance_net_worth
+          - sensor.sure_finance_total_cashflow
+          - sensor.sure_finance_total_outflow
+        hours_to_show: 720  # 30 days
+        refresh_interval: 300
+
+  - title: Detailed Analysis
+    path: analysis
+    cards:
+      # Entity list for all accounts
+      - type: entities
+        title: All Accounts
+        entities:
+          - entity: sensor.sure_finance_account_checking
+            name: Checking Account
+          - entity: sensor.sure_finance_account_savings
+            name: Savings Account
+          - entity: sensor.sure_finance_account_credit_card
+            name: Credit Card
+          - entity: sensor.sure_finance_account_mortgage
+            name: Mortgage
+          - type: divider
+          - entity: sensor.sure_finance_net_worth
+            name: Total Net Worth
+      
+      # Statistics card
+      - type: statistics-graph
+        title: Monthly Statistics
+        entities:
+          - sensor.sure_finance_total_cashflow
+          - sensor.sure_finance_total_outflow
+        stat_types:
+          - mean
+          - min
+          - max
+        period:
+          calendar:
+            period: month
+      
+      # Markdown card with additional info
+      - type: markdown
+        title: Financial Summary
+        content: |
+          ## Current Financial Status
+          
+          **Last Updated:** {{ states.sensor.sure_finance_net_worth.last_updated.strftime('%Y-%m-%d %H:%M') }}
+          
+          ### Key Metrics
+          - **Net Worth:** {{ states('sensor.sure_finance_net_worth') }}
+          - **Monthly Income:** {{ state_attr('sensor.sure_finance_total_cashflow', 'monthly_income') }}
+          - **Monthly Expenses:** {{ state_attr('sensor.sure_finance_total_outflow', 'monthly_expenses') }}
+          - **Savings Rate:** {{ states('sensor.sure_finance_monthly_savings_rate') }}%
+          
+          ### Top Expense Categories
+          {% set expenses = state_attr('sensor.sure_finance_total_outflow', 'expenses_by_category') %}
+          {% if expenses %}
+          {% for category, amount in expenses.items() | sort(attribute=1, reverse=true) | list[:5] %}
+          - **{{ category }}:** ${{ amount | round(2) }}
+          {% endfor %}
+          {% endif %}

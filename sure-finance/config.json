@@ -1,0 +1,44 @@
+{
+  "name": "Sure Finance",
+  "version": "1.0.0",
+  "slug": "sure_finance",
+  "description": "Home Assistant addon for Sure Finance API - Track cashflows, outflows, and liabilities",
+  "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
+  "startup": "application",
+  "boot": "auto",
+  "options": {
+    "api_key": "",
+    "update_interval": 300,
+    "currency": "USD",
+    "enable_cashflow_sensor": true,
+    "enable_outflow_sensor": true,
+    "enable_liability_sensor": true,
+    "enable_account_sensors": true,
+    "enable_transaction_sensors": true,
+    "cache_duration": 3600
+  },
+  "schema": {
+    "api_key": "password",
+    "update_interval": "int(60,3600)",
+    "currency": "str",
+    "enable_cashflow_sensor": "bool",
+    "enable_outflow_sensor": "bool",
+    "enable_liability_sensor": "bool",
+    "enable_account_sensors": "bool",
+    "enable_transaction_sensors": "bool",
+    "cache_duration": "int(300,86400)"
+  },
+  "ports": {
+    "8099/tcp": 8099
+  },
+  "ports_description": {
+    "8099/tcp": "Web interface"
+  },
+  "webui": "http://[HOST]:[PORT:8099]",
+  "hassio_api": true,
+  "homeassistant_api": true,
+  "ingress": true,
+  "ingress_port": 8099,
+  "panel_icon": "mdi:finance",
+  "panel_title": "Sure Finance"
+}
