@@ -49,7 +49,7 @@ The Sure Finance Home Assistant addon integrates your Sure Finance account with 
    ```
    1. Navigate to Supervisor → Add-on Store
    2. Click the three dots menu → Repositories
-   3. Add: https://github.com/yourusername/sure-finance-hass-addon
+   3. Add: https://github.com/juanmaus/sure-finance-hass-addon
    ```
 
 2. **Install Addon**
@@ -364,8 +364,8 @@ docker run -p 8099:8099 sure-finance
 
 ## Support
 
-- **Issues**: https://github.com/yourusername/sure-finance-hass-addon/issues
-- **Discussions**: https://github.com/yourusername/sure-finance-hass-addon/discussions
+- **Issues**: https://github.com/juanmaus/sure-finance-hass-addon/issues
+- **Discussions**: https://github.com/juanmaus/sure-finance-hass-addon/discussions
 - **Home Assistant Community**: https://community.home-assistant.io
 
 ## License

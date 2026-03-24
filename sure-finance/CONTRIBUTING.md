@@ -35,7 +35,7 @@ By participating in this project, you agree to abide by our Code of Conduct:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/sure-finance-hass-addon.git
+git clone https://github.com/juanmaus/sure-finance-hass-addon.git
 cd sure-finance-hass-addon
 
 # Create virtual environment
