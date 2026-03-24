@@ -364,8 +364,8 @@ docker run -p 8099:8099 sure-finance
 
 ## Support
 
-- **Issues**: https://github.com/juanmaus/sure-finance-hass-addon/issues
-- **Discussions**: https://github.com/juanmaus/sure-finance-hass-addon/discussions
+- **Issues**: https://github.com/juanmaus/sure-finance-hass-addons/issues
+- **Discussions**: https://github.com/juanmaus/sure-finance-hass-addons/discussions
 - **Home Assistant Community**: https://community.home-assistant.io
 
 ## License
