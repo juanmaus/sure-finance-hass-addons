@@ -32,7 +32,7 @@ RUN apk del .build-deps
 COPY . /app/
 
 # Copy rootfs (s6-overlay service definitions)
-COPY rootfs /
+COPY ./rootfs/ /
 
 # Ensure proper permissions
 RUN chmod a+x /etc/services.d/*/run
