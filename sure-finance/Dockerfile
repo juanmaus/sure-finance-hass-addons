@@ -25,11 +25,11 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # Copy application files
 COPY . /app/
 
-# Make run script executable
-RUN chmod a+x /app/run.sh
+# Copy rootfs (s6-overlay service definitions)
+COPY rootfs /
 
 # Expose web interface port
 EXPOSE 8099
 
-# Run the application
-CMD [ "/app/run.sh" ]
+# Set s6-overlay as the init system
+ENTRYPOINT ["/init"]
