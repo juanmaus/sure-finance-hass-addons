@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.0] - 2024-01-10
+## [1.0.1] - 2026-03-24
 
 ### Initial Release
 - Basic integration with Sure Finance API
