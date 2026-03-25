@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="Sure Finance Home Assistant Addon",
     description="Financial tracking addon for Home Assistant",
-    version="1.0.0"
+    version="1.0.1"
 )
 
 # Add CORS middleware

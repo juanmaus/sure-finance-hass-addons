@@ -1,7 +1,7 @@
 {
   "domain": "sure_finance",
   "name": "Sure Finance",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "documentation": "https://github.com/juanmaus/sure-finance-hass-addons",
   "issue_tracker": "https://github.com/juanmaus/sure-finance-hass-addons/issues",
   "dependencies": [],

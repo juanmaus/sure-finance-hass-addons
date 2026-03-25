@@ -120,7 +120,7 @@ class SureFinanceBaseSensor(CoordinatorEntity, SensorEntity):
             name="Sure Finance",
             manufacturer="Sure Finance",
             model="Financial Tracker",
-            sw_version="1.0.0",
+            sw_version="1.0.1",
         )
         
     @property
