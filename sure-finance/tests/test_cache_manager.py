@@ -8,8 +8,6 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import aioredis
-
 from src.cache_manager import CacheManager
 
 
@@ -226,7 +224,7 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_redis_connection_failure(self, cache_manager):
         """Test handling of Redis connection failure."""
-        with patch("aioredis.from_url", side_effect=Exception("Connection failed")):
+        with patch("redis.asyncio.Redis.from_url", side_effect=Exception("Connection failed")):
             await cache_manager.connect_redis()
             assert cache_manager._redis is None
         

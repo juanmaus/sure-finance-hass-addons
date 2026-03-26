@@ -1,7 +1,4 @@
-"""Home Assistant sensor integration for Sure Finance.
-
-This module creates sensor entities for financial data from Sure Finance API.
-"""
+"""Home Assistant sensor integration for Sure Finance."""
 
 import logging
 from datetime import datetime, timedelta
@@ -15,7 +12,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CURRENCY_DOLLAR
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import (
@@ -24,7 +21,7 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from .data_manager import DataManager
-from .models import AccountBalance, FinancialSummary
+from .models import AccountBalance
 
 logger = logging.getLogger(__name__)
 
@@ -120,7 +117,7 @@ class SureFinanceBaseSensor(CoordinatorEntity, SensorEntity):
             name="Sure Finance",
             manufacturer="Sure Finance",
             model="Financial Tracker",
-            sw_version="1.0.2",
+            sw_version="1.0.0",
         )
         
     @property
@@ -143,7 +140,6 @@ class CashflowSensor(SureFinanceBaseSensor):
     """Sensor for total cashflow (income)."""
     
     def __init__(self, coordinator: SureFinanceDataUpdateCoordinator, currency: str):
-        """Initialize the sensor."""
         super().__init__(
             coordinator,
             "total_cashflow",
@@ -154,14 +150,12 @@ class CashflowSensor(SureFinanceBaseSensor):
         
     @property
     def native_value(self) -> float:
-        """Return the state of the sensor."""
         if self.coordinator.data and "summary" in self.coordinator.data:
             return float(self.coordinator.data["summary"].total_cashflow)
         return 0.0
         
     @property
     def extra_state_attributes(self) -> Dict[str, Any]:
-        """Return additional state attributes."""
         attrs = {}
         if self.coordinator.data and "monthly_cashflow" in self.coordinator.data:
             monthly = self.coordinator.data["monthly_cashflow"]
@@ -176,7 +170,6 @@ class OutflowSensor(SureFinanceBaseSensor):
     """Sensor for total outflow (expenses)."""
     
     def __init__(self, coordinator: SureFinanceDataUpdateCoordinator, currency: str):
-        """Initialize the sensor."""
         super().__init__(
             coordinator,
             "total_outflow",
@@ -187,14 +180,12 @@ class OutflowSensor(SureFinanceBaseSensor):
         
     @property
     def native_value(self) -> float:
-        """Return the state of the sensor."""
         if self.coordinator.data and "summary" in self.coordinator.data:
             return float(self.coordinator.data["summary"].total_outflow)
         return 0.0
         
     @property
     def extra_state_attributes(self) -> Dict[str, Any]:
-        """Return additional state attributes."""
         attrs = {}
         if self.coordinator.data and "monthly_cashflow" in self.coordinator.data:
             monthly = self.coordinator.data["monthly_cashflow"]
@@ -209,7 +200,6 @@ class LiabilitySensor(SureFinanceBaseSensor):
     """Sensor for total liabilities."""
     
     def __init__(self, coordinator: SureFinanceDataUpdateCoordinator, currency: str):
-        """Initialize the sensor."""
         super().__init__(
             coordinator,
             "total_liability",
@@ -220,14 +210,12 @@ class LiabilitySensor(SureFinanceBaseSensor):
         
     @property
     def native_value(self) -> float:
-        """Return the state of the sensor."""
         if self.coordinator.data and "summary" in self.coordinator.data:
             return float(self.coordinator.data["summary"].total_liabilities)
         return 0.0
         
     @property
     def extra_state_attributes(self) -> Dict[str, Any]:
-        """Return additional state attributes."""
         attrs = {}
         if self.coordinator.data and "balances" in self.coordinator.data:
             liability_accounts = [
@@ -246,7 +234,6 @@ class NetWorthSensor(SureFinanceBaseSensor):
     """Sensor for net worth."""
     
     def __init__(self, coordinator: SureFinanceDataUpdateCoordinator, currency: str):
-        """Initialize the sensor."""
         super().__init__(
             coordinator,
             "net_worth",
@@ -257,14 +244,12 @@ class NetWorthSensor(SureFinanceBaseSensor):
         
     @property
     def native_value(self) -> float:
-        """Return the state of the sensor."""
         if self.coordinator.data and "summary" in self.coordinator.data:
             return float(self.coordinator.data["summary"].net_worth)
         return 0.0
         
     @property
     def extra_state_attributes(self) -> Dict[str, Any]:
-        """Return additional state attributes."""
         attrs = {}
         if self.coordinator.data and "summary" in self.coordinator.data:
             summary = self.coordinator.data["summary"]
@@ -282,7 +267,6 @@ class AccountBalanceSensor(SureFinanceBaseSensor):
         coordinator: SureFinanceDataUpdateCoordinator,
         account: AccountBalance
     ):
-        """Initialize the sensor."""
         super().__init__(
             coordinator,
             f"account_{account.account_id}",
@@ -295,7 +279,6 @@ class AccountBalanceSensor(SureFinanceBaseSensor):
         
     @property
     def native_value(self) -> float:
-        """Return the state of the sensor."""
         if self.coordinator.data and "balances" in self.coordinator.data:
             for balance in self.coordinator.data["balances"]:
                 if balance.account_id == self._account_id:
@@ -304,7 +287,6 @@ class AccountBalanceSensor(SureFinanceBaseSensor):
         
     @property
     def extra_state_attributes(self) -> Dict[str, Any]:
-        """Return additional state attributes."""
         attrs = {"account_name": self._account_name}
         if self.coordinator.data and "balances" in self.coordinator.data:
             for balance in self.coordinator.data["balances"]:
@@ -319,7 +301,6 @@ class MonthlySavingsRateSensor(SureFinanceBaseSensor):
     """Sensor for monthly savings rate."""
     
     def __init__(self, coordinator: SureFinanceDataUpdateCoordinator):
-        """Initialize the sensor."""
         super().__init__(
             coordinator,
             "monthly_savings_rate",
@@ -330,17 +311,14 @@ class MonthlySavingsRateSensor(SureFinanceBaseSensor):
         
     @property
     def device_class(self) -> None:
-        """Return the device class."""
         return None  # Percentage, not monetary
         
     @property
     def state_class(self) -> SensorStateClass:
-        """Return the state class."""
         return SensorStateClass.MEASUREMENT
         
     @property
     def native_value(self) -> float:
-        """Return the state of the sensor."""
         if self.coordinator.data and "monthly_cashflow" in self.coordinator.data:
             monthly = self.coordinator.data["monthly_cashflow"]
             if monthly.total_income > 0:
@@ -351,7 +329,6 @@ class MonthlySavingsRateSensor(SureFinanceBaseSensor):
         
     @property
     def extra_state_attributes(self) -> Dict[str, Any]:
-        """Return additional state attributes."""
         attrs = {}
         if self.coordinator.data and "monthly_cashflow" in self.coordinator.data:
             monthly = self.coordinator.data["monthly_cashflow"]
@@ -367,21 +344,17 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up Sure Finance sensors."""
-    # Get data manager from hass.data
     data_manager = hass.data[DOMAIN][config_entry.entry_id]["data_manager"]
     config = config_entry.data
     
-    # Create coordinator
     coordinator = SureFinanceDataUpdateCoordinator(
         hass,
         data_manager,
         config.get("update_interval", 300)
     )
     
-    # Fetch initial data
     await coordinator.async_config_entry_first_refresh()
     
-    # Create sensors based on configuration
     sensors = []
     currency = config.get("currency", CURRENCY_DOLLAR)
     
@@ -394,19 +367,13 @@ async def async_setup_entry(
     if config.get("enable_liability_sensor", True):
         sensors.append(LiabilitySensor(coordinator, currency))
         
-    # Always add net worth sensor
     sensors.append(NetWorthSensor(coordinator, currency))
-    
-    # Add monthly savings rate sensor
     sensors.append(MonthlySavingsRateSensor(coordinator))
     
-    # Add account sensors if enabled
     if config.get("enable_account_sensors", True) and "balances" in coordinator.data:
         for balance in coordinator.data["balances"]:
             sensors.append(AccountBalanceSensor(coordinator, balance))
     
-    # Add all sensors
     async_add_entities(sensors)
     
-    # Store coordinator for later use
     hass.data[DOMAIN][config_entry.entry_id]["coordinator"] = coordinator

@@ -22,6 +22,7 @@ Track your financial data from Sure Finance directly in Home Assistant. This add
 ## Configuration
 
 - `api_key`: Your Sure Finance API key (required)
+- `host`: Base URL of your Sure Finance API (default: https://app.sure.am). Use your local URL if self-hosted
 - `update_interval`: How often to fetch data (seconds, default: 300)
 - `currency`: Default currency for display (default: USD)
 - `enable_cashflow_sensor`: Enable income tracking sensor

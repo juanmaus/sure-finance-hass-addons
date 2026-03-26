@@ -80,6 +80,7 @@ The Sure Finance Home Assistant addon integrates your Sure Finance account with 
 
 ```yaml
 api_key: "your-sure-finance-api-key"
+host: "https://app.sure.am"  # Base URL of your Sure API; set to your local URL if self-hosted
 update_interval: 300  # seconds (default: 5 minutes)
 currency: "USD"      # default currency
 enable_cashflow_sensor: true
@@ -103,6 +104,7 @@ cache_duration: 3600  # seconds (default: 1 hour)
 | `enable_account_sensors` | bool | true | Create individual account sensors |
 | `enable_transaction_sensors` | bool | true | Enable transaction tracking |
 | `cache_duration` | int | 3600 | How long to cache data (seconds) |
+| `host` | string | https://app.sure.am | Base URL of the Sure API (use local URL if self-hosted) |
 
 ## Usage
 

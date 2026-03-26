@@ -1,4 +1,7 @@
-#!/usr/bin/with-contenv bashio
+#!/usr/bin/env bash
+set -euo pipefail
+# shellcheck source=/dev/null
+source /usr/lib/bashio/bashio.sh
 
 # Get configuration from Home Assistant
 export API_KEY=$(bashio::config 'api_key')
@@ -10,9 +13,11 @@ export ENABLE_LIABILITY=$(bashio::config 'enable_liability_sensor')
 export ENABLE_ACCOUNTS=$(bashio::config 'enable_account_sensors')
 export ENABLE_TRANSACTIONS=$(bashio::config 'enable_transaction_sensors')
 export CACHE_DURATION=$(bashio::config 'cache_duration')
+export HOST=$(bashio::config 'host')
+export BASE_URL=$(bashio::config 'base_url')
 
 # Get Home Assistant URL and token
-export SUPERVISOR_TOKEN="${SUPERVISOR_TOKEN}"
+export SUPERVISOR_TOKEN="${SUPERVISOR_TOKEN:-}"
 export HASS_URL="http://supervisor/core"
 
 bashio::log.info "Starting Sure Finance addon..."
@@ -20,4 +25,4 @@ bashio::log.info "Update interval: ${UPDATE_INTERVAL} seconds"
 bashio::log.info "Currency: ${CURRENCY}"
 
 # Run the Python application
-python3 /app/main.py
+exec python3 /app/main.py

@@ -1,6 +1,6 @@
 {
   "name": "Sure Finance",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "slug": "sure_finance",
   "description": "Home Assistant addon for Sure Finance API - Track cashflows, outflows, and liabilities",
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
@@ -8,6 +8,7 @@
   "boot": "auto",
   "options": {
     "api_key": "",
+    "host": "https://app.sure.am",
     "update_interval": 300,
     "currency": "USD",
     "enable_cashflow_sensor": true,
@@ -19,6 +20,7 @@
   },
   "schema": {
     "api_key": "password",
+    "host": "str?",
     "update_interval": "int(60,3600)",
     "currency": "str",
     "enable_cashflow_sensor": "bool",

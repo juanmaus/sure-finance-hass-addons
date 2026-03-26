@@ -8,7 +8,6 @@ from homeassistant import config_entries
 from homeassistant.const import CONF_API_KEY
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
-from homeassistant.helpers import config_validation as cv
 
 from .api_client import SureFinanceClient, AuthenticationError
 
@@ -35,16 +34,11 @@ SCHEMA_USER = vol.Schema({
 
 
 async def validate_input(hass: HomeAssistant, data: Dict[str, Any]) -> Dict[str, Any]:
-    """Validate the user input allows us to connect.
-    
-    Data has the keys from SCHEMA_USER with values provided by the user.
-    """
-    # Create API client and test connection
+    """Validate the user input allows us to connect."""
     client = SureFinanceClient(api_key=data[CONF_API_KEY], base_url=data.get("host") or data.get("base_url"))
 
     try:
         await client.connect()
-        # Try to fetch accounts to verify API key
         await client.get_accounts()
         await client.close()
     except AuthenticationError:
@@ -53,7 +47,6 @@ async def validate_input(hass: HomeAssistant, data: Dict[str, Any]) -> Dict[str,
         logger.error(f"Unexpected error: {e}")
         raise ValueError("cannot_connect")
     
-    # Return info that you want to store in the config entry
     return {"title": "Sure Finance"}
 
 
@@ -71,13 +64,10 @@ class SureFinanceConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             try:
                 info = await validate_input(self.hass, user_input)
-                
-                # Create unique ID based on API key (hashed for security)
                 await self.async_set_unique_id(
                     f"sure_finance_{hash(user_input[CONF_API_KEY])}"
                 )
                 self._abort_if_unique_id_configured()
-                
                 return self.async_create_entry(
                     title=info["title"],
                     data=user_input
@@ -101,5 +91,4 @@ class SureFinanceConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
     
     async def async_step_import(self, import_data: Dict[str, Any]) -> FlowResult:
-        """Handle import from configuration.yaml."""
         return await self.async_step_user(import_data)

@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="Sure Finance Home Assistant Addon",
     description="Financial tracking addon for Home Assistant",
-    version="1.0.1"
+    version="1.0.2"
 )
 
 # Add CORS middleware
@@ -69,12 +69,13 @@ async def startup_event():
     update_interval = int(os.environ.get("UPDATE_INTERVAL", "300"))
     currency = os.environ.get("CURRENCY", "USD")
     cache_duration = int(os.environ.get("CACHE_DURATION", "3600"))
-    
+    base_url = os.environ.get("HOST") or os.environ.get("BASE_URL") or os.environ.get("SURE_API_BASE_URL")
+
     # Initialize components
     logger.info("Initializing Sure Finance addon...")
     
     # API client
-    api_client = SureFinanceClient(api_key=api_key)
+    api_client = SureFinanceClient(api_key=api_key, base_url=base_url)
     await api_client.connect()
     
     # Cache manager
@@ -244,7 +245,7 @@ async def root():
         async function loadDashboard() {
             try {
                 // Load summary
-                const summaryRes = await fetch('/api/summary');
+                const summaryRes = await fetch('api/summary');
                 const summary = await summaryRes.json();
                 
                 document.getElementById('net-worth').textContent = 
@@ -253,7 +254,7 @@ async def root():
                     formatCurrency(summary.total_liabilities, summary.currency);
                 
                 // Load monthly data
-                const monthlyRes = await fetch('/api/monthly');
+                const monthlyRes = await fetch('api/monthly');
                 const monthly = await monthlyRes.json();
                 
                 document.getElementById('income').textContent = 
@@ -274,7 +275,7 @@ async def root():
                 });
                 
                 // Load accounts
-                const accountsRes = await fetch('/api/accounts');
+                const accountsRes = await fetch('api/accounts');
                 const accounts = await accountsRes.json();
                 
                 const tbody = document.querySelector('#accounts-table tbody');
@@ -289,7 +290,7 @@ async def root():
                 `).join('');
                 
                 // Load trends
-                const trendsRes = await fetch('/api/trends');
+                const trendsRes = await fetch('api/trends');
                 const trends = await trendsRes.json();
                 
                 const cashflowData = [
@@ -340,7 +341,7 @@ async def get_summary():
     
     try:
         summary = await data_manager.get_financial_summary()
-        return summary.model_dump()
+        return summary.model_dump(mode="json")
     except Exception as e:
         logger.error(f"Error getting summary: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -356,7 +357,7 @@ async def get_monthly():
         from datetime import datetime
         now = datetime.utcnow()
         monthly = await data_manager.get_monthly_cashflow(now.year, now.month)
-        return monthly.model_dump()
+        return monthly.model_dump(mode="json")
     except Exception as e:
         logger.error(f"Error getting monthly data: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -371,7 +372,7 @@ async def get_accounts():
     try:
         accounts = await data_manager.get_accounts()
         balances = calculator.get_account_balances(accounts)
-        return [b.model_dump() for b in balances]
+        return [b.model_dump(mode="json") for b in balances]
     except Exception as e:
         logger.error(f"Error getting accounts: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -386,7 +387,7 @@ async def get_trends():
     try:
         transactions = await data_manager.get_transactions(days=365)
         trends = calculator.calculate_monthly_trends(transactions, months=12)
-        return {k: v.model_dump() for k, v in trends.items()}
+        return {k: v.model_dump(mode="json") for k, v in trends.items()}
     except Exception as e:
         logger.error(f"Error getting trends: {e}")
         raise HTTPException(status_code=500, detail=str(e))

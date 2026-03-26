@@ -28,14 +28,14 @@ async def async_setup(hass: HomeAssistant, config: Dict[str, Any]) -> bool:
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Sure Finance from a config entry."""
     config = entry.data
-    
+
     # Create API client
     api_client = SureFinanceClient(
         api_key=config["api_key"],
         base_url=config.get("host") or config.get("base_url"),
         timeout=30
     )
-    
+
     # Test authentication
     try:
         await api_client.connect()
@@ -47,17 +47,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     except Exception as e:
         logger.error(f"Failed to connect to Sure Finance API: {e}")
         raise ConfigEntryNotReady from e
-    
+
     # Create cache manager
     cache_manager = CacheManager(
         cache_dir=hass.config.path("custom_components", DOMAIN, "cache"),
         default_ttl=config.get("cache_duration", 3600)
     )
     await cache_manager.connect_redis()
-    
+
     # Create financial calculator
     calculator = FinancialCalculator(currency=config.get("currency", "USD"))
-    
+
     # Create data manager
     data_manager = DataManager(
         api_client=api_client,
@@ -65,7 +65,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         calculator=calculator,
         update_interval=config.get("update_interval", 300)
     )
-    
+
     # Store instances for platforms
     hass.data[DOMAIN][entry.entry_id] = {
         "api_client": api_client,
@@ -73,13 +73,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "data_manager": data_manager,
         "calculator": calculator
     }
-    
+
     # Forward entry setup to platforms
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-    
+
     # Register services
     await async_setup_services(hass, entry)
-    
+
     return True
 
 
@@ -87,32 +87,32 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     # Unload platforms
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-    
+
     if unload_ok:
         # Clean up
         data = hass.data[DOMAIN].pop(entry.entry_id)
         await data["api_client"].close()
         await data["cache_manager"].close()
-        
+
         # Remove services if no more entries
         if not hass.data[DOMAIN]:
             await async_remove_services(hass)
-    
+
     return unload_ok
 
 
 async def async_setup_services(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Set up Sure Finance services."""
-    
+
     async def refresh_data(call):
         """Service to manually refresh data."""
         data_manager = hass.data[DOMAIN][entry.entry_id]["data_manager"]
         await data_manager.sync_all_data()
-        
+
         # Update sensors
         if "coordinator" in hass.data[DOMAIN][entry.entry_id]:
             await hass.data[DOMAIN][entry.entry_id]["coordinator"].async_request_refresh()
-    
+
     async def clear_cache(call):
         """Service to clear cache."""
         cache_manager = hass.data[DOMAIN][entry.entry_id]["cache_manager"]
@@ -121,7 +121,7 @@ async def async_setup_services(hass: HomeAssistant, entry: ConfigEntry) -> None:
         await cache_manager.clear_namespace("summaries")
         await cache_manager.clear_namespace("cashflow")
         logger.info("Sure Finance cache cleared")
-    
+
     # Register services
     hass.services.async_register(DOMAIN, "refresh_data", refresh_data)
     hass.services.async_register(DOMAIN, "clear_cache", clear_cache)

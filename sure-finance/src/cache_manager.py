@@ -11,8 +11,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
-import aioredis
-from aioredis import Redis
+from redis.asyncio import Redis
 
 logger = logging.getLogger(__name__)
 
@@ -47,11 +46,17 @@ class CacheManager:
         """Connect to Redis if URL provided."""
         if self.redis_url and not self._redis:
             try:
-                self._redis = await aioredis.from_url(
+                # redis.asyncio client (Python 3.11 compatible)
+                self._redis = Redis.from_url(
                     self.redis_url,
                     encoding="utf-8",
                     decode_responses=True
                 )
+                # Test connection lazily with a ping
+                try:
+                    await self._redis.ping()
+                except Exception:
+                    pass
                 logger.info("Connected to Redis cache")
             except Exception as e:
                 logger.warning(f"Failed to connect to Redis: {e}")

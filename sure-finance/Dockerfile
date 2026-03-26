@@ -32,10 +32,22 @@ RUN apk del .build-deps
 COPY . /app/
 
 # Copy rootfs (s6-overlay service definitions)
-COPY ./rootfs/ /
+# Note: Build servers may use different contexts; copy from /app if needed
+RUN if [ -d /app/rootfs ]; then \
+      cp -r /app/rootfs/* /; \
+    elif [ -d /app/sure-finance/rootfs ]; then \
+      cp -r /app/sure-finance/rootfs/* /; \
+    else \
+      echo "rootfs not found in build context" && ls -la /app && exit 1; \
+    fi
 
 # Ensure proper permissions
-RUN chmod a+x /etc/services.d/*/run
+RUN \
+  if ls /etc/services.d/*/run >/dev/null 2>&1; then chmod a+x /etc/services.d/*/run; fi; \
+  if ls /etc/services.d/*/finish >/dev/null 2>&1; then chmod a+x /etc/services.d/*/finish; fi
+
+COPY run.sh /
+RUN chmod a+x /run.sh
 
 # Build arguments
 ARG BUILD_ARCH
@@ -56,4 +68,4 @@ LABEL \
 EXPOSE 8099
 
 # Set s6-overlay as the init system
-ENTRYPOINT ["/init"]
+ENTRYPOINT ["/run.sh"]
