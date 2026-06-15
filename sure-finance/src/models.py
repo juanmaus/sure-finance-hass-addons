@@ -135,7 +135,6 @@ class Account(BaseEntity):
 class Category(BaseEntity):
     """Category model."""
     name: str
-    classification: CategoryClassification
     color: str
     icon: str
     parent_id: Optional[UUID] = None

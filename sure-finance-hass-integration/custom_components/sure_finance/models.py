@@ -22,7 +22,6 @@ class AccountClassification(str, Enum):
     INCOME = "income"
     EXPENSE = "expense"
 
-
 class CategoryClassification(str, Enum):
     INCOME = "income"
     EXPENSE = "expense"
